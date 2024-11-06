@@ -1,148 +1,87 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(ProductApp());
+  runApp(MyApp());
 }
 
-// Ürün Modeli
-class Product {
-  final String name;
-  final double price;
-
-  Product({required this.name, required this.price});
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
 }
 
-// Örnek ürün listesi
-List<Product> products = [
-  Product(name: 'Laptop', price: 1500),
-  Product(name: 'Telefon', price: 800),
-  Product(name: 'Tablet', price: 500),
-  Product(name: 'Kamera', price: 300),
-  Product(name: 'Kulaklık', price: 100),
-  // Daha fazla ürün ekleyebilirsiniz
-];
+class _MyAppState extends State<MyApp> {
+  bool isDarkTheme = false;
 
-// Ana Uygulama Widget’ı
-class ProductApp extends StatelessWidget {
+  void toggleTheme() {
+    setState(() {
+      isDarkTheme = !isDarkTheme;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Ürün Listesi',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: ProductScreen(),
+      theme: isDarkTheme ? darkTheme : lightTheme,
+      home: HomePage(toggleTheme: toggleTheme),
     );
   }
 }
 
-// Ürün Sayfası için StatefulWidget
-class ProductScreen extends StatefulWidget {
-  @override
-  _ProductScreenState createState() => _ProductScreenState();
-}
+// Açık tema
+final ThemeData lightTheme = ThemeData(
+  brightness: Brightness.light,
+  primarySwatch: Colors.blue,
+  backgroundColor: Colors.white,
+  textTheme: TextTheme(
+    bodyText2: TextStyle(color: Colors.black),
+  ),
+  buttonTheme: ButtonThemeData(
+    buttonColor: Colors.blue,
+    textTheme: ButtonTextTheme.primary,
+  ),
+);
 
-class _ProductScreenState extends State<ProductScreen> {
-  int selectedIndex = -1; // Başlangıçta hiçbir ürün seçilmemiş
+// Karanlık tema
+final ThemeData darkTheme = ThemeData(
+  brightness: Brightness.dark,
+  primarySwatch: Colors.deepPurple,
+  backgroundColor: Colors.black,
+  textTheme: TextTheme(
+    bodyText2: TextStyle(color: Colors.white),
+  ),
+  buttonTheme: ButtonThemeData(
+    buttonColor: Colors.deepPurple,
+    textTheme: ButtonTextTheme.primary,
+  ),
+);
+
+class HomePage extends StatelessWidget {
+  final VoidCallback toggleTheme;
+
+  HomePage({required this.toggleTheme});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Ürün Listesi'),
+        title: Text('Tema Değiştirme Uygulaması'),
       ),
-      body: Column(
-        children: [
-          _buildHorizontalListView(),
-          Expanded(child: _buildGridView()),
-        ],
-      ),
-    );
-  }
-
-  // Horizontal ListView Oluşturma
-  Widget _buildHorizontalListView() {
-    return Container(
-      height: 100,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: products.length,
-        itemBuilder: (context, index) {
-          return GestureDetector(
-            onTap: () {
-              setState(() {
-                selectedIndex = index;
-              });
-            },
-            child: Container(
-              margin: EdgeInsets.all(8),
-              padding: EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: selectedIndex == index ? Colors.blue : Colors.grey[300],
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Center(
-                child: Text(
-                  products[index].name,
-                  style: TextStyle(
-                    color: selectedIndex == index ? Colors.white : Colors.black,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Tema Değiştir',
+              style: Theme.of(context).textTheme.bodyText2,
             ),
-          );
-        },
-      ),
-    );
-  }
-
-  // GridView Oluşturma
-  Widget _buildGridView() {
-    return GridView.builder(
-      padding: EdgeInsets.all(8),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2, // Her satırda iki öğe
-        childAspectRatio: 2, // Öğe oranı
-        mainAxisSpacing: 8,
-        crossAxisSpacing: 8,
-      ),
-      itemCount: products.length,
-      itemBuilder: (context, index) {
-        return InkWell(
-          onTap: () {
-            setState(() {
-              selectedIndex = index;
-            });
-          },
-          child: Container(
-            decoration: BoxDecoration(
-              color: selectedIndex == index
-                  ? Colors.orange[200]
-                  : Colors.grey[200],
-              border: Border.all(
-                color:
-                    selectedIndex == index ? Colors.orange : Colors.transparent,
-                width: 2,
-              ),
-              borderRadius: BorderRadius.circular(8),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: toggleTheme,
+              child: Text('Temayı Değiştir'),
             ),
-            padding: EdgeInsets.all(8),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  products[index].name,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  '\$${products[index].price.toString()}',
-                  style: TextStyle(fontSize: 14, color: Colors.grey[700]),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+          ],
+        ),
+      ),
     );
   }
 }
